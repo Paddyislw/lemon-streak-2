@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Habit Tracker — Paper Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Indie+Flower&family=Sue+Ellen+Francisco&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --mint:#E0EFD5;
+  --lemon:#FCEFA6;
+  --lemon-hover:#fbe680;
+  --ink:#181818;
+  --ink-light:#555;
+  --paper:#fffdf7;
+  --paper-line:#c9dfc0;
+  --shadow:4px 4px 0 var(--ink);
+  --sketchy-btn:255px 15px 225px 15px / 15px 225px 15px 255px;
+  --sketchy-card:2px 255px 3px 25px / 255px 5px 225px 3px;
+}
+
+html{font-size:16px}
+
+body{
+  background:var(--mint);
+  font-family:'Indie Flower',cursive;
+  color:var(--ink);
+  min-height:100vh;
+  padding:24px 16px 80px;
+  position:relative;
+  overflow-x:hidden;
+}
+
+/* ── Floating Lemon SVG Stickers ── */
+.lemon-sticker{
+  position:fixed;
+  z-index:0;
+  pointer-events:none;
+  opacity:.85;
+  animation:floatLemon 6s ease-in-out infinite;
+}
+.lemon-sticker.top-left{top:18px;left:12px;animation-delay:0s}
+.lemon-sticker.top-right{top:24px;right:16px;animation-delay:1.5s}
+.lemon-sticker.bottom-left{bottom:30px;left:20px;animation-delay:3s}
+.lemon-sticker.bottom-right{bottom:20px;right:14px;animation-delay:4.5s}
+
+@keyframes floatLemon{
+  0%,100%{transform:translateY(0) rotate(0deg)}
+  25%{transform:translateY(-10px) rotate(4deg)}
+  50%{transform:translateY(-4px) rotate(-3deg)}
+  75%{transform:translateY(-12px) rotate(2deg)}
+}
+
+/* ── Container ── */
+.container{
+  max-width:960px;
+  margin:0 auto;
+  position:relative;
+  z-index:1;
+}
+
+/* ── Title ── */
+h1{
+  font-family:'Gloria Hallelujah',cursive;
+  font-size:2.2rem;
+  text-align:center;
+  margin-bottom:6px;
+  transform:rotate(-1deg);
+}
+h1 .lemon-icon{
+  font-style:normal;
+  display:inline-block;
+  animation:floatLemon 4s ease-in-out infinite;
+}
+
+.subtitle{
+  font-family:'Sue Ellen Francisco',cursive;
+  text-align:center;
+  font-size:1.15rem;
+  color:var(--ink-light);
+  margin-bottom:28px;
+  letter-spacing:.5px;
+}
+
+/* ── Paper Note Card (Input Section) ── */
+.paper-card{
+  background:var(--paper);
+  border:2px solid var(--ink);
+  border-radius:var(--sketchy-card);
+  box-shadow:var(--shadow);
+  padding:24px 28px;
+  transform:rotate(-1deg);
+  transition:transform .2s ease,box-shadow .2s ease;
+  margin-bottom:32px;
+  position:relative;
+}
+.paper-card:hover{
+  transform:rotate(-0.3deg) translateY(-3px);
+  box-shadow:6px 7px 0 var(--ink);
+}
+
+.input-row{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.input-row input{
+  flex:1;
+  min-width:200px;
+  font-family:'Indie Flower',cursive;
+  font-size:1.1rem;
+  padding:10px 16px;
+  border:2px dashed var(--ink);
+  border-radius:var(--sketchy-card);
+  background:transparent;
+  color:var(--ink);
+  outline:none;
+  transition:border-color .2s,border-style .2s;
+}
+.input-row input::placeholder{color:#999;font-style:italic}
+.input-row input:focus{border-color:#6aaa5a;border-style:solid}
+
+.btn{
+  font-family:'Gloria Hallelujah',cursive;
+  font-size:1rem;
+  padding:10px 22px;
+  border:2px solid var(--ink);
+  border-radius:var(--sketchy-btn);
+  background:var(--lemon);
+  color:var(--ink);
+  cursor:pointer;
+  box-shadow:var(--shadow);
+  transition:transform .1s,box-shadow .1s,background .15s;
+  white-space:nowrap;
+}
+.btn:hover{background:var(--lemon-hover)}
+.btn:active{
+  transform:translate(3px,3px);
+  box-shadow:1px 1px 0 var(--ink);
+}
+
+/* ── Habit Pills List ── */
+.habits-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:16px;
+}
+.habit-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:var(--lemon);
+  border:2px solid var(--ink);
+  border-radius:var(--sketchy-btn);
+  padding:6px 14px;
+  font-family:'Indie Flower',cursive;
+  font-size:.95rem;
+  transform:rotate(0.5deg);
+  box-shadow:2px 2px 0 var(--ink);
+  transition:transform .15s,box-shadow .15s;
+}
+.habit-pill:hover{
+  transform:rotate(0deg) scale(1.03);
+  box-shadow:3px 3px 0 var(--ink);
+}
+
+.habit-pill .streak{
+  font-family:'Sue Ellen Francisco',cursive;
+  font-size:.88rem;
+  color:var(--ink-light);
+  margin-left:2px;
+}
+.habit-pill .delete-btn{
+  background:none;
+  border:none;
+  font-size:1.15rem;
+  cursor:pointer;
+  color:var(--ink-light);
+  line-height:1;
+  padding:0 2px;
+  font-family:Arial,sans-serif;
+  transition:color .15s;
+}
+.habit-pill .delete-btn:hover{color:#c0392b}
+
+/* ── Month Navigation ── */
+.month-nav{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  margin-bottom:20px;
+}
+.month-nav .month-label{
+  font-family:'Gloria Hallelujah',cursive;
+  font-size:1.6rem;
+  min-width:220px;
+  text-align:center;
+}
+.nav-btn{
+  font-family:'Gloria Hallelujah',cursive;
+  font-size:1.3rem;
+  width:48px;
+  height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:2px solid var(--ink);
+  border-radius:var(--sketchy-btn);
+  background:var(--paper);
+  color:var(--ink);
+  cursor:pointer;
+  box-shadow:var(--shadow);
+  transition:transform .1s,box-shadow .1s,background .15s;
+}
+.nav-btn:hover{background:var(--lemon)}
+.nav-btn:active{
+  transform:translate(3px,3px);
+  box-shadow:1px 1px 0 var(--ink);
+}
+
+/* ── Calendar Wrapper (Lined Paper Effect) ── */
+.calendar-wrapper{
+  background:var(--paper);
+  border:2px solid var(--ink);
+  border-radius:var(--sketchy-card);
+  box-shadow:var(--shadow);
+  padding:20px 16px 24px;
+  position:relative;
+  background-image:
+    repeating-linear-gradient(
+      transparent,
+      transparent 27px,
+      var(--paper-line) 27px,
+      var(--paper-line) 28px
+    );
+  background-position:0 18px;
+}
+
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:8px;
+}
+
+/* ── Day-of-Week Headers ── */
+.day-header{
+  font-family:'Sue Ellen Francisco',cursive;
+  font-size:1.05rem;
+  text-align:center;
+  padding:4px 0 8px;
+  color:var(--ink-light);
+  border-bottom:1px dashed var(--ink-light);
+  margin-bottom:4px;
+}
+
+/* ── Day Cells (Polaroid-style) ── */
+.day-cell{
+  background:var(--paper);
+  border:2px dashed var(--ink-light);
+  border-radius:4px;
+  min-height:72px;
+  padding:6px 5px 8px;
+  position:relative;
+  transition:transform .15s,box-shadow .15s;
+}
+.day-cell:hover{
+  transform:translateY(-2px);
+  box-shadow:2px 3px 0 rgba(0,0,0,.15);
+}
+.day-cell.today{
+  background:var(--lemon);
+  border-style:solid;
+  border-color:var(--ink);
+}
+.day-cell.empty{
+  background:transparent;
+  border-color:transparent;
+  pointer-events:none;
+}
+.day-cell.empty:hover{transform:none;box-shadow:none}
+
+.day-number{
+  font-family:'Gloria Hallelujah',cursive;
+  font-size:.85rem;
+  margin-bottom:4px;
+  color:var(--ink);
+}
+
+/* ── Habit Toggle Circles ── */
+.habit-toggles{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+}
+
+.habit-toggle{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  border:2px solid var(--ink);
+  background:transparent;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.7rem;
+  transition:background .15s,transform .15s;
+  padding:0;
+  line-height:1;
+  position:relative;
+}
+.habit-toggle:hover{transform:scale(1.18)}
+.habit-toggle.done{
+  background:var(--lemon);
+  box-shadow:inset 0 0 0 1px var(--ink);
+}
+.habit-toggle.done::after{
+  content:'✓';
+  font-size:.75rem;
+  color:var(--ink);
+  font-weight:bold;
+}
+
+/* Tooltip on hover */
+.habit-toggle[data-tooltip]:hover::before{
+  content:attr(data-tooltip);
+  position:absolute;
+  bottom:calc(100% + 6px);
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--ink);
+  color:var(--paper);
+  font-family:'Sue Ellen Francisco',cursive;
+  font-size:.82rem;
+  padding:3px 9px;
+  border-radius:4px;
+  white-space:nowrap;
+  pointer-events:none;
+  z-index:10;
+}
+
+/* ── Responsive ── */
+@media(max-width:640px){
+  h1{font-size:1.6rem}
+  .paper-card{padding:16px 18px;transform:rotate(0)}
+  .month-nav .month-label{font-size:1.2rem;min-width:160px}
+  .calendar-grid{gap:4px}
+  .day-cell{min-height:56px;padding:4px 3px 6px}
+  .habit-toggle{width:18px;height:18px}
+  .habit-pill{font-size:.88rem;padding:5px 10px}
+}
+@media(max-width:420px){
+  .calendar-grid{gap:2px}
+  .day-cell{min-height:48px;padding:3px 2px 4px}
+  .day-number{font-size:.7rem}
+  .habit-toggle{width:15px;height:15px}
+  .habit-toggle.done::after{font-size:.6rem}
+}
+</style>
+</head>
+<body>
+
+<!-- Floating Lemon SVG Stickers -->
+<svg class="lemon-sticker top-left" width="54" height="54" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="27" cy="27" rx="22" ry="18" fill="#FCEFA6" stroke="#181818" stroke-width="2" transform="rotate(-18 27 27)"/>
+  <ellipse cx="27" cy="27" rx="14" ry="10" fill="#f7e36d" stroke="#181818" stroke-width="1" transform="rotate(-18 27 27)" opacity=".45"/>
+  <path d="M10 18 Q7 12 12 10" stroke="#6aaa5a" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <ellipse cx="9" cy="11" rx="4" ry="6" fill="#6aaa5a" stroke="#181818" stroke-width="1" transform="rotate(-40 9 11)" opacity=".7"/>
+</svg>
+<svg class="lemon-sticker top-right" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="24" cy="24" rx="19" ry="15" fill="#FCEFA6" stroke="#181818" stroke-width="2" transform="rotate(12 24 24)"/>
+  <ellipse cx="24" cy="24" rx="12" ry="8" fill="#f7e36d" stroke="#181818" stroke-width="1" transform="rotate(12 24 24)" opacity=".4"/>
+  <path d="M40 14 Q44 10 40 7" stroke="#6aaa5a" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <ellipse cx="41" cy="8" rx="3.5" ry="5.5" fill="#6aaa5a" stroke="#181818" stroke-width="1" transform="rotate(30 41 8)" opacity=".7"/>
+</svg>
+<svg class="lemon-sticker bottom-left" width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="21" cy="21" rx="17" ry="13" fill="#FCEFA6" stroke="#181818" stroke-width="2" transform="rotate(8 21 21)"/>
+  <ellipse cx="21" cy="21" rx="10" ry="7" fill="#f7e36d" stroke="#181818" stroke-width="1" transform="rotate(8 21 21)" opacity=".4"/>
+</svg>
+<svg class="lemon-sticker bottom-right" width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="25" cy="25" rx="20" ry="16" fill="#FCEFA6" stroke="#181818" stroke-width="2" transform="rotate(-10 25 25)"/>
+  <ellipse cx="25" cy="25" rx="13" ry="9" fill="#f7e36d" stroke="#181818" stroke-width="1" transform="rotate(-10 25 25)" opacity=".4"/>
+  <path d="M8 16 Q4 11 8 8" stroke="#6aaa5a" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <ellipse cx="7" cy="9" rx="3" ry="5" fill="#6aaa5a" stroke="#181818" stroke-width="1" transform="rotate(-35 7 9)" opacity=".7"/>
+</svg>
+
+<div class="container">
+  <h1><span class="lemon-icon">🍋</span> Habit Tracker</h1>
+  <p class="subtitle">track your daily habits on paper</p>
+
+  <!-- Habit Input Section -->
+  <div class="paper-card" id="inputCard">
+    <div class="input-row">
+      <input type="text" id="habitInput" placeholder='e.g. "Drink 2L water"' maxlength="40" aria-label="Habit name">
+      <button class="btn" id="addBtn" aria-label="Add habit">Add Habit</button>
+    </div>
+    <div class="habits-list" id="habitsList" aria-live="polite"></div>
+  </div>
+
+  <!-- Month Navigation -->
+  <div class="month-nav">
+    <button class="nav-btn" id="prevMonth" aria-label="Previous month">←</button>
+    <span class="month-label" id="monthLabel"></span>
+    <button class="nav-btn" id="nextMonth" aria-label="Next month">→</button>
+  </div>
+
+  <!-- Calendar -->
+  <div class="calendar-wrapper">
+    <div class="calendar-grid" id="calendarGrid"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ── Persistent State ── */
+  var STORAGE_KEY = 'habitTracker_v1';
+
+  var state = loadState();
+  var viewYear = new Date().getFullYear();
+  var viewMonth = new Date().getMonth();
+
+  function defaultState(){
+    return { habits: [], completions: {} };
+  }
+
+  function loadState(){
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return defaultState();
+      var parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed.habits) || typeof parsed.completions !== 'object') return defaultState();
+      return parsed;
+    } catch(e){ return defaultState(); }
+  }
+
+  function saveState(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  /* ── Constants ── */
+  var MONTH_NAMES = ['January','February','March','April','May','June',
+    'July','August','September','October','November','December'];
+  var DAY_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  /* ── Date Helpers ── */
+  function dateKey(y, m, d){
+    return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+  }
+
+  function todayKey(){
+    var t = new Date();
+    return dateKey(t.getFullYear(), t.getMonth(), t.getDate());
+  }
+
+  function daysInMonth(y, m){
+    return new Date(y, m + 1, 0).getDate();
+  }
+
+  function firstDayOfMonth(y, m){
+    return new Date(y, m, 1).getDay();
+  }
+
+  function generateId(){
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  /* ── Streak Calculation ──
+     Counts consecutive completed days ending at today.
+     If today is not yet completed, the streak counts back from yesterday. */
+  function calcStreak(habitId){
+    var now = new Date();
+    var d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var streak = 0;
+
+    /* Check if today is completed */
+    var tk = dateKey(d.getFullYear(), d.getMonth(), d.getDate());
+    var todayData = state.completions[tk];
+    var todayDone = todayData && todayData[habitId];
+
+    if (!todayDone) {
+      /* Start from yesterday */
+      d.setDate(d.getDate() - 1);
+    }
+
+    while (true) {
+      var key = dateKey(d.getFullYear(), d.getMonth(), d.getDate());
+      var dayData = state.completions[key];
+      if (dayData && dayData[habitId]) {
+        streak++;
+        d.setDate(d.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  /* ── Habit Actions ── */
+  function addHabit(name){
+    var trimmed = name.trim();
+    if (!trimmed) return;
+    if (state.habits.length >= 12) return;
+    state.habits.push({ id: generateId(), name: trimmed });
+    saveState();
+    renderAll();
+  }
+
+  function deleteHabit(habitId){
+    state.habits = state.habits.filter(function(h){ return h.id !== habitId; });
+    /* Clean up completions for the deleted habit */
+    var keys = Object.keys(state.completions);
+    for (var i = 0; i < keys.length; i++) {
+      if (state.completions[keys[i]][habitId]) {
+        delete state.completions[keys[i]][habitId];
+        /* Remove empty date entries */
+        if (Object.keys(state.completions[keys[i]]).length === 0) {
+          delete state.completions[keys[i]];
+        }
+      }
+    }
+    saveState();
+    renderAll();
+  }
+
+  function toggleCompletion(habitId, key){
+    if (!state.completions[key]) state.completions[key] = {};
+    if (state.completions[key][habitId]) {
+      delete state.completions[key][habitId];
+      if (Object.keys(state.completions[key]).length === 0) {
+        delete state.completions[key];
+      }
+    } else {
+      state.completions[key][habitId] = true;
+    }
+    saveState();
+    renderAll();
+  }
+
+  /* ── Render Habit Pills ── */
+  function renderHabits(){
+    var container = document.getElementById('habitsList');
+    container.innerHTML = '';
+
+    for (var i = 0; i < state.habits.length; i++) {
+      var habit = state.habits[i];
+      var pill = document.createElement('span');
+      pill.className = 'habit-pill';
+
+      var nameSpan = document.createElement('span');
+      nameSpan.textContent = habit.name;
+      pill.appendChild(nameSpan);
+
+      var streak = calcStreak(habit.id);
+      if (streak > 0) {
+        var streakSpan = document.createElement('span');
+        streakSpan.className = 'streak';
+        streakSpan.textContent = '\uD83D\uDD25 ' + streak + ' day' + (streak !== 1 ? 's' : '');
+        pill.appendChild(streakSpan);
+      }
+
+      var delBtn = document.createElement('button');
+      delBtn.className = 'delete-btn';
+      delBtn.textContent = '\u00D7';
+      delBtn.setAttribute('aria-label', 'Delete ' + habit.name);
+      delBtn.setAttribute('data-habit-id', habit.id);
+      delBtn.addEventListener('click', (function(hid){
+        return function(e){
+          e.stopPropagation();
+          deleteHabit(hid);
+        };
+      })(habit.id));
+      pill.appendChild(delBtn);
+
+      container.appendChild(pill);
+    }
+  }
+
+  /* ── Render Calendar ── */
+  function renderCalendar(){
+    var grid = document.getElementById('calendarGrid');
+    grid.innerHTML = '';
+
+    /* Day-of-week headers */
+    for (var h = 0; h < DAY_LABELS.length; h++) {
+      var headerEl = document.createElement('div');
+      headerEl.className = 'day-header';
+      headerEl.textContent = DAY_LABELS[h];
+      grid.appendChild(headerEl);
+    }
+
+    var numDays = daysInMonth(viewYear, viewMonth);
+    var startDay = firstDayOfMonth(viewYear, viewMonth);
+    var tk = todayKey();
+
+    /* Leading empty cells */
+    for (var e = 0; e < startDay; e++) {
+      var empty = document.createElement('div');
+      empty.className = 'day-cell empty';
+      grid.appendChild(empty);
+    }
+
+    /* Day cells */
+    for (var d = 1; d <= numDays; d++) {
+      var key = dateKey(viewYear, viewMonth, d);
+      var cell = document.createElement('div');
+      cell.className = 'day-cell';
+      if (key === tk) cell.classList.add('today');
+
+      var numEl = document.createElement('div');
+      numEl.className = 'day-number';
+      numEl.textContent = d;
+      cell.appendChild(numEl);
+
+      if (state.habits.length > 0) {
+        var togglesWrap = document.createElement('div');
+        togglesWrap.className = 'habit-toggles';
+
+        for (var j = 0; j < state.habits.length; j++) {
+          var habit = state.habits[j];
+          var btn = document.createElement('button');
+          btn.className = 'habit-toggle';
+          btn.setAttribute('data-tooltip', habit.name);
+          btn.setAttribute('aria-label', habit.name + ' on day ' + d);
+
+          var dayData = state.completions[key];
+          if (dayData && dayData[habit.id]) {
+            btn.classList.add('done');
+          }
+
+          btn.addEventListener('click', (function(hid, k){
+            return function(){
+              toggleCompletion(hid, k);
+            };
+          })(habit.id, key));
+
+          togglesWrap.appendChild(btn);
+        }
+
+        cell.appendChild(togglesWrap);
+      }
+
+      grid.appendChild(cell);
+    }
+
+    /* Trailing empty cells to complete the last row */
+    var totalCells = startDay + numDays;
+    var remainder = totalCells % 7;
+    if (remainder !== 0) {
+      for (var t = 0; t < 7 - remainder; t++) {
+        var trailEmpty = document.createElement('div');
+        trailEmpty.className = 'day-cell empty';
+        grid.appendChild(trailEmpty);
+      }
+    }
+  }
+
+  /* ── Render Month Label ── */
+  function renderMonthLabel(){
+    document.getElementById('monthLabel').textContent =
+      MONTH_NAMES[viewMonth] + ' ' + viewYear;
+  }
+
+  /* ── Render All ── */
+  function renderAll(){
+    renderHabits();
+    renderCalendar();
+    renderMonthLabel();
+  }
+
+  /* ── Event Listeners ── */
+  document.getElementById('addBtn').addEventListener('click', function(){
+    var input = document.getElementById('habitInput');
+    addHabit(input.value);
+    input.value = '';
+    input.focus();
+  });
+
+  document.getElementById('habitInput').addEventListener('keydown', function(e){
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addHabit(this.value);
+      this.value = '';
+    }
+  });
+
+  document.getElementById('prevMonth').addEventListener('click', function(){
+    viewMonth--;
+    if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+    renderAll();
+  });
+
+  document.getElementById('nextMonth').addEventListener('click', function(){
+    viewMonth++;
+    if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+    renderAll();
+  });
+
+  /* ── Initial Render ── */
+  renderAll();
+
+})();
+</script>
+</body>
+</html>
